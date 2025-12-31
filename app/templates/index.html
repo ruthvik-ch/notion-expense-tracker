@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Notion Expense Tracker</title>
+        <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+</head>
+<body>
+
+<div class="card">
+    <h2>Add Expense</h2>
+
+    <textarea id="expenseText" placeholder="e.g. Spent 1280 on bus tickets yesterday"></textarea>
+
+    <button onclick="submitExpense()">Add Expense</button>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script src="/static/main.js"></script>
+</body>
+</html>

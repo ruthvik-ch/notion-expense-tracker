@@ -1,9 +1,9 @@
 from flask import Flask
-from app.routes import api
+from app.controllers.expense_controller import expense_controller
 
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(api)
+    app.register_blueprint(expense_controller)
     return app
 
 if __name__ == "__main__":
