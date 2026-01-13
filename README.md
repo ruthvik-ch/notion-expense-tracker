@@ -1,13 +1,14 @@
-# notion-expense-tracker
+# Notion Expense Tracker
 
-To run
-(.venv) pip install -r requirements.txt
-(.venv) flask --app app.main run
+A lightweight Flask app that lets you add expenses to a Notion database using natural language.
+It uses OpenAI to extract structured expense data and stores it via the Notion API.
 
+## Setup
+
+```bash
 git clone https://github.com/ruthvik-ch/notion-expense-tracker.git
 cd .\notion-expense-tracker\
 python -m venv .expvenv1 
 .expvenv1\Scripts\Activate.ps1
-pip install -r requirements.txt
-flask --app app.main run
-
+(.expvenv1) pip install -r requirements.txt
+(.expvenv1) flask --app app.main run
