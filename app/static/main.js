@@ -1,20 +1,56 @@
+// --------------------
+// THEME TOGGLE
+// --------------------
+(function initTheme() {
+    const html = document.documentElement;
+    const toggleBtn = document.getElementById("theme-toggle");
+
+    if (!toggleBtn) return;
+
+    const storedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const initialTheme = storedTheme || (systemPrefersDark ? "dark" : "light");
+    html.setAttribute("data-bs-theme", initialTheme);
+    updateToggleIcon(initialTheme);
+
+    toggleBtn.addEventListener("click", () => {
+        const currentTheme = html.getAttribute("data-bs-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        html.setAttribute("data-bs-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateToggleIcon(newTheme);
+    });
+
+    function updateToggleIcon(theme) {
+        toggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+})();
+
+
+// --------------------
+// EXPENSE SUBMIT
+// --------------------
 async function submitExpense() {
-    const text = document.getElementById("expenseText").value.trim();
+    const textArea = document.getElementById("expenseText");
     const statusDiv = document.getElementById("status");
+    const submitBtn = document.getElementById("submit-btn");
+
+    const text = textArea.value.trim();
 
     if (!text) {
-        statusDiv.innerHTML = "<span class='error'>Please enter expense text</span>";
+        showStatus("Please enter expense text", "danger");
         return;
     }
 
-    statusDiv.innerHTML = "⏳ Adding expense...";
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Adding...";
 
     try {
         const response = await fetch("/expense/text", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text })
         });
 
@@ -24,16 +60,23 @@ async function submitExpense() {
             throw new Error(data.error || "Failed to add expense");
         }
 
-        statusDiv.innerHTML = `
-            <div class="success">
-                ✅ Expense added successfully<br/>
-                <pre>${JSON.stringify(data.parsed, null, 2)}</pre>
-            </div>
-        `;
+        showStatus(
+            `Expense added successfully!<pre class="mt-2">${JSON.stringify(data.parsed, null, 2)}</pre>`,
+            "success"
+        );
 
-        document.getElementById("expenseText").value = "";
+        textArea.value = "";
 
     } catch (err) {
-        statusDiv.innerHTML = `<span class='error'>❌ ${err.message}</span>`;
+        showStatus(err.message, "danger");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Add Expense";
     }
+}
+
+function showStatus(message, type) {
+    const statusDiv = document.getElementById("status");
+    statusDiv.className = `alert alert-${type}`;
+    statusDiv.innerHTML = message;
 }
