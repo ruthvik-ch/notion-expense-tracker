@@ -12,3 +12,5 @@ python -m venv .expvenv1
 .expvenv1\Scripts\Activate.ps1
 (.expvenv1) pip install -r requirements.txt
 (.expvenv1) flask --app app.main run
+// for debugging use :- flask --app app.main --debug run
+
