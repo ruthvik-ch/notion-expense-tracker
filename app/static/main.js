@@ -5,26 +5,29 @@
     const html = document.documentElement;
     const toggleBtn = document.getElementById("theme-toggle");
 
-    if (!toggleBtn) return;
-
     const storedTheme = localStorage.getItem("theme");
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
     const initialTheme = storedTheme || (systemPrefersDark ? "dark" : "light");
     html.setAttribute("data-bs-theme", initialTheme);
-    updateToggleIcon(initialTheme);
+    
+    if (toggleBtn) {
+        updateToggleIcon(initialTheme);
 
-    toggleBtn.addEventListener("click", () => {
-        const currentTheme = html.getAttribute("data-bs-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        toggleBtn.addEventListener("click", () => {
+            const currentTheme = html.getAttribute("data-bs-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-        html.setAttribute("data-bs-theme", newTheme);
-        localStorage.setItem("theme", newTheme);
-        updateToggleIcon(newTheme);
-    });
+            html.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            updateToggleIcon(newTheme);
+        });
+    }
 
     function updateToggleIcon(theme) {
-        toggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+        if (toggleBtn) {
+            toggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+        }
     }
 })();
 

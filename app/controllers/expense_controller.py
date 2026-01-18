@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, session
 
 from app.services.notion import fetch_category_map, add_expense_page
 from app.services.gpt import parse_text
@@ -9,6 +9,16 @@ from app.utils.operation_logger import log_operation
 
 
 expense_controller = Blueprint("expense_controller", __name__)
+
+# Helper function to get database context
+def get_db_context():
+    """
+    Returns appropriate database configuration based on login status.
+    If logged in, uses R-prefixed vars (private database).
+    Otherwise uses regular vars (public database).
+    """
+    logged_in = session.get("logged_in", False)
+    return "private" if logged_in else "public"
 
 # ---------- VIEW CONTROLLER ----------
 
@@ -26,22 +36,24 @@ def add_expense_from_text():
     parsed = None
     payload = None
     notion_summary = None
+    db_context = get_db_context()
 
     try:
         if not text:
             raise ValueError("Input text is required")
 
-        category_map = fetch_category_map()
+        category_map = fetch_category_map(db_context)
         parsed = parse_text(text, list(category_map.keys()))
         validate_categories(parsed, category_map)
 
-        payload = build_notion_payload(parsed, category_map)
-        result = add_expense_page(payload)
+        payload = build_notion_payload(parsed, category_map, db_context)
+        result = add_expense_page(payload, db_context)
 
         notion_summary = {
             "status": "success",
             "page_id": result["id"],
-            "notion_url": result.get("url")
+            "notion_url": result.get("url"),
+            "database": "private" if db_context == "private" else "public"
         }
 
         log_operation(
@@ -55,7 +67,8 @@ def add_expense_from_text():
         return jsonify({
             "status": "success",
             "page_id": result["id"],
-            "parsed": parsed
+            "parsed": parsed,
+            "database": "private" if db_context == "private" else "public"
         })
 
     except Exception as e:
